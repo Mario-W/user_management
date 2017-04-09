@@ -1,7 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from sqlalchemy.orm import sessionmaker
 from manage import app
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:630131222@localhost/user_management?charset=utf8'
@@ -11,7 +10,7 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
-session = sessionmaker(bind=app)
+session = db.session
 
 class User(db.Model):
 

@@ -30,7 +30,7 @@ class UserHandler(object):
         result, msg = self._check_data(data)
         if not result:
             return result, msg
-        user_obj = User(**result)
+        user_obj = c
         try:
             session.add(user_obj)
             session.commit()
@@ -43,11 +43,20 @@ class UserHandler(object):
         user_obj = User.query.filter_by(id=user_id).first()
         if not user_obj:
             return False, '找不到该用户'
+        data = {
+            'name': data.get('name', user_obj.name),
+            'age': data.get('age', user_obj.age),
+            'sex': data.get('sex', user_obj.sex),
+            'address': data.get('address', user_obj.address),
+        }
         result, msg = self._check_data(data)
         if not result:
             return result, msg
         try:
-            user_obj.__dict__.update(result)
+            # user_obj._sa_instance_state.committed_state.update(msg)
+            msg['id'] = user_obj.id
+            user_obj = User(**msg)
+            session.merge(user_obj)
             session.commit()
             return True, '修改成功'
         except:

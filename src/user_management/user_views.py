@@ -1,18 +1,25 @@
 from flask import Flask, request, jsonify
 from manage import app
 from user_handler import UserHandler
+from copy import deepcopy
 
 @app.route('/user/user_list/', methods=['GET'])
 def user_list():
     page_index = request.args.get('page_index')
     user_handler = UserHandler()
     users = user_handler.get_user_list(page_index) if page_index else user_handler.get_user_list()
-    return jsonify({'res': 'ok', 'data': [user.__dict__ for user in users]})
+    return jsonify({'res': 'ok', 'data': [{
+                                              'id': user.id,
+                                              'name': user.name,
+                                              'age': user.age,
+                                              'sex': user.sex,
+                                              'address': user.address,
+                                          } for user in users]})
 
 @app.route('/user/add_user/', methods=['POST'])
 def add_user():
     if request.method == 'POST':
-        data = request.args
+        data = deepcopy(request.json) if request.is_json else deepcopy(request.form)
         user_handler = UserHandler()
         result, result_msg = user_handler.add_user(data)
         if not result:
@@ -25,8 +32,8 @@ def add_user():
 @app.route('/user/edit_user/', methods=['POST'])
 def edit_user():
     if request.method == 'POST':
-        user_id = request.args.get('user_id')
-        data = request.args
+        data = deepcopy(request.json) if request.is_json else deepcopy(request.form)
+        user_id = data.get('user_id')
         user_handler = UserHandler()
         result, result_msg = user_handler.edit_user(user_id, data)
         if not result:
@@ -39,7 +46,8 @@ def edit_user():
 @app.route('/user/delete_user/', methods=['POST'])
 def delete_user():
     if request.method == 'POST':
-        user_id = request.args.get('user_id')
+        data = deepcopy(request.json) if request.is_json else deepcopy(request.form)
+        user_id = data.get('user_id')
         user_handler = UserHandler()
         result, result_msg = user_handler.delete_user(user_id)
         if not result:
@@ -60,7 +68,8 @@ def sign_in_ranking_list():
 @app.route('/user/sign_in/', methods=['POST'])
 def sign_in():
     if request.method == 'POST':
-        user_id = request.args.get('user_id')
+        data = deepcopy(request.json) if request.is_json else deepcopy(request.form)
+        user_id = data.get('user_id')
         user_handler = UserHandler()
         result, result_msg = user_handler.sign_in(user_id)
         if not result:
