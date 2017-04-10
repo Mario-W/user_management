@@ -30,7 +30,7 @@ class UserHandler(object):
         result, msg = self._check_data(data)
         if not result:
             return result, msg
-        user_obj = c
+        user_obj = User(**msg)
         try:
             session.add(user_obj)
             session.commit()
